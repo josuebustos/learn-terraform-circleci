@@ -1,3 +1,3 @@
 region = "us-east-1"
-label  = "hashicorp.test"
+label  = "hashicorp.one"
 app    = "terramino"
