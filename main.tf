@@ -7,39 +7,22 @@ provider "aws" {
     }
   }
 }
-
-resource "random_uuid" "randomid" {}
-
-resource "aws_s3_bucket" "app" {
-  tags = {
-    Name = "App Bucket"
-  }
-
-  bucket        = "${var.app}.${var.label}.${random_uuid.randomid.result}"
-  force_destroy = true
+variable "website_root" {
+  type        = string
+  description = "Path to the root of website content"
+  default     = "./assets/index.html"
 }
 
-resource "aws_s3_object" "app" {
-  acl          = "public-read"
-  key          = "index.html"
-  bucket       = aws_s3_bucket.app.id
-  content      = file("./assets/index.html")
-  content_type = "text/html"
+resource "aws_s3_bucket" "my_static_website" {
+  bucket = "blog-example-m9wtv64y"
+  acl    = "private"
+
+  website {
+    index_document = "index.html"
+  }
 }
 
-resource "aws_s3_bucket_acl" "bucket" {
-  bucket = aws_s3_bucket.app.id
-  acl    = "public-read"
-}
-
-resource "aws_s3_bucket_website_configuration" "terramino" {
-  bucket = aws_s3_bucket.app.bucket
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "error.html"
-  }
+# To print the bucket's website URL after creation
+output "website_endpoint" {
+  value = aws_s3_bucket.my_static_website.website_endpoint
 }
